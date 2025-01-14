@@ -8,7 +8,7 @@ const LoginPage = () => {
     password: "",
   });
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // Loading state for feedback
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -21,15 +21,16 @@ const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError(""); // Clear previous errors
-    setIsLoading(true); // Start loading state
+    setError("");
+    setIsLoading(true);
 
     try {
-      const response = await loginUser(formData); // Pass formData as an object
+      const response = await loginUser(formData);
       setIsLoading(false);
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("id", response.data.user._id);
       localStorage.setItem("role", "user");
+      console.log("Token saved:", localStorage.getItem("token"));
       navigate("/home");
     } catch (error) {
       setIsLoading(false);
@@ -60,7 +61,7 @@ const LoginPage = () => {
             </label>
             <input
               id="email"
-              name="email" // Add name attribute
+              name="email"
               type="email"
               className="w-full px-3 py-2 border rounded"
               value={formData.email}
@@ -77,7 +78,7 @@ const LoginPage = () => {
             </label>
             <input
               id="password"
-              name="password" // Add name attribute
+              name="password"
               type="password"
               className="w-full px-3 py-2 border rounded"
               value={formData.password}
