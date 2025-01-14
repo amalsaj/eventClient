@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* Customizing Tailwind for a modern professional look */
+body {
+    font-family: 'Inter', sans-serif;
+  }
