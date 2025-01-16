@@ -1,42 +1,52 @@
 import React, { useState, useEffect } from "react";
 import { IoMdNotificationsOutline } from "react-icons/io";
-import { Link, useNavigate } from "react-router-dom"; 
+import { Link, useNavigate } from "react-router-dom";
 import socket from "../utils/socket";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
+import { enqueueSnackbar } from "notistack";
 
-const Navbar = ({ onSearch }) => {
+const Navbar = ({ onSearch, events }) => {
   const navigate = useNavigate();
   const role = localStorage.getItem("role");
-
-  // State to manage notifications
+  const userId = localStorage.getItem("id");
+  const [eventId, seteventId] = useState();
   const [notifications, setNotifications] = useState([]);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false); 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem("role");
     localStorage.removeItem("token");
     localStorage.removeItem("id");
+    enqueueSnackbar("Logout Successfully 🎉", {
+      variant: "success",
+    });
     navigate("/");
   };
 
-  // Function to handle new notifications
-  const notification = (message) => {
-    setNotifications((prevNotifications) => [
-      ...prevNotifications,
-      { id: Date.now(), message, read: false },
-    ]);
+  const notification = (eventId) => {
+    const event = events.find((event) => event._id === eventId);
+    if (event && event.createdBy._id === userId) {
+      const eventMessage = `A new user has joined the "${event.name}" event.`;
+      console.log("eventMessage: ", eventMessage);
+      setNotifications((prevNotifications) => [
+        ...prevNotifications,
+        { id: Date.now(), message: eventMessage, read: false },
+      ]);
+      console.log(notifications);
+    }
   };
 
   useEffect(() => {
-    socket.on("attendeeUpdated", () => {
-      notification("new user joined an event");
+    socket.on("attendeeUpdated", (data) => {
+      seteventId(data.eventId);
+      notification(data.eventId);
     });
 
     return () => {
       socket.off("attendeeUpdated");
     };
-  }, []);
+  }, [events]);
 
   const handleNotificationClick = () => {
     setIsPopupVisible(!isPopupVisible);
@@ -48,7 +58,6 @@ const Navbar = ({ onSearch }) => {
     );
   };
 
-  // Calculate unread notification count
   const unreadCount = notifications.filter((notif) => !notif.read).length;
 
   return (
@@ -148,28 +157,52 @@ const Navbar = ({ onSearch }) => {
         </div>
       )}
 
-      {/* Notification Pop-up */}
+      {/* Notification Popup */}
       {isPopupVisible && (
-        <div className="absolute right-0 mt-12  lg:mt-0 w-40 p-4 bg-white shadow-lg rounded-lg border border-gray-200">
-          <h3 className="text-xl font-semibold text-gray-900">
+        <div className="absolute right-0 mt-12 lg:mt-0 w-72 max-w-sm p-4 bg-white shadow-lg rounded-lg border border-gray-200 z-50 transition-transform transform scale-100 hover:scale-105">
+          <h3 className="text-xl font-semibold text-gray-900 border-b pb-2 mb-3">
             Notifications
           </h3>
-          <ul className="mt-2">
+          <ul className="space-y-2">
             {notifications.length === 0 ? (
-              <li className="text-gray-600">No new notifications</li>
+              <li className="text-gray-500 text-center">
+                No new notifications
+              </li>
             ) : (
               notifications.map((notification) => (
                 <li
                   key={notification.id}
-                  className={`py-2 text-gray-800 ${
-                    notification.read ? "opacity-60" : "font-bold"
+                  className={`flex items-start p-3 bg-gray-100 rounded-lg shadow-md hover:bg-gray-200 transition-all duration-200 ${
+                    notification.read ? "opacity-60" : "font-medium"
                   }`}
                 >
-                  {notification.message}
+                  <div className="flex-shrink-0 mr-3">
+                    <span className="text-blue-600">
+                      <IoMdNotificationsOutline className="text-lg" />
+                    </span>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-800">
+                      {notification.message}
+                    </p>
+                    <span className="text-xs text-gray-400 block mt-1">
+                      {new Date().toLocaleString()}
+                    </span>
+                  </div>
                 </li>
               ))
             )}
           </ul>
+          {notifications.length > 0 && (
+            <div className="mt-3 text-center">
+              <button
+                onClick={() => setNotifications([])} // Clear all notifications
+                className="text-red-600 hover:text-red-800 font-semibold text-sm"
+              >
+                Clear all
+              </button>
+            </div>
+          )}
         </div>
       )}
     </nav>

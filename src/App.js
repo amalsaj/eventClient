@@ -4,18 +4,27 @@ import Home from "./pages/Home";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/Register";
 import DashboardPage from "./pages/Dashboard";
-// import Header from "./components/Header";
+import { SnackbarProvider } from "notistack";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/home" element={<Home />} />
-        <Route path="/dashboard" element={<DashboardPage />} /> 
-        <Route path="/" element={<LoginPage />} /> 
-        <Route path="/register" element={<RegisterPage />} /> 
-      </Routes>
-    </Router>
+    <div className="App">
+      <SnackbarProvider
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        autoHideDuration={3000}
+      ></SnackbarProvider>
+      <Router>
+        <Routes>
+          <Route path="/home" element={<Home />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+        </Routes>
+      </Router>
+    </div>
   );
 }
 

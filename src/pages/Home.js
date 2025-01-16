@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import EventList from "../components/EventList";
 import { getAllEvents } from "../utils/api";
 import socket from "../utils/socket";
+import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -11,6 +12,7 @@ const HomePage = () => {
   const [selectedEndDate, setSelectedEndDate] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [events, setEvents] = useState([]);
+  const navigate = useNavigate();
   const listen = [
     "eventCreated",
     "eventDeleted",
@@ -29,11 +31,15 @@ const HomePage = () => {
       setEvents(data);
       setIsLoading(false);
     } catch (error) {
-      console.error("Error fetching events:", error);
+      if (error.response && error.response.data && error.response.data.message === "token expired") {
+        navigate("/");
+      } else {
+        console.error("Error fetching events:", error);
+      }
     }
   };
+  
 
-  // Listen for all events dynamically
   listen.forEach((eventType) => {
     socket.on(eventType, () => {
       fetchAllEvents();
@@ -65,29 +71,29 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Navbar onSearch={handleSearch} />
+      <Navbar onSearch={handleSearch} events={events} />
       <main className="container mx-auto py-10 px-4">
-  <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-    {/* Filter Section */}
-    <div className="col-span-1  bg-white p-6 rounded-lg shadow-lg">
-      <h3 className="text-xl font-semibold text-gray-800 mb-6">
-        Filters
-      </h3>
-      <div className="mb-6">
-        <label
-          className="block text-gray-700 text-sm font-medium mb-2"
-          htmlFor="category"
-        >
-          Category
-        </label>
-        <select
-          id="category"
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out"
-        >
-          <option value="All">All Categories</option>
-          <option value="conference">Conference</option>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Filter Section */}
+          <div className="col-span-1  bg-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-xl font-semibold text-gray-800 mb-6">
+              Filters
+            </h3>
+            <div className="mb-6">
+              <label
+                className="block text-gray-700 text-sm font-medium mb-2"
+                htmlFor="category"
+              >
+                Category
+              </label>
+              <select
+                id="category"
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out"
+              >
+                <option value="All">All Categories</option>
+                <option value="conference">Conference</option>
                 <option value="webinar">Webinar</option>
                 <option value="workshop">Workshop</option>
                 <option value="meetup">Meetup</option>
@@ -150,44 +156,43 @@ const HomePage = () => {
                 <option value="band-performance">Band Performance</option>
                 <option value="sound-healing">Sound Healing</option>
                 <option value="music-award-show">Music Award Show</option>
-        </select>
-      </div>
-      <div className="mb-6">
-        <label
-          className="block text-gray-700 text-sm font-medium mb-2"
-          htmlFor="date"
-        >
-          Date Range
-        </label>
-        <div className="flex flex-col lg:gap-9">
-          <input
-            type="date"
-            id="start-date"
-            value={selectedStartDate}
-            onChange={(e) => setSelectedStartDate(e.target.value)}
-            className="w-full mb-4 lg:mb-0 px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out"
-          />
-          <input
-            type="date"
-            id="end-date"
-            value={selectedEndDate}
-            onChange={(e) => setSelectedEndDate(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out"
-          />
+              </select>
+            </div>
+            <div className="mb-6">
+              <label
+                className="block text-gray-700 text-sm font-medium mb-2"
+                htmlFor="date"
+              >
+                Date Range
+              </label>
+              <div className="flex flex-col lg:gap-9">
+                <input
+                  type="date"
+                  id="start-date"
+                  value={selectedStartDate}
+                  onChange={(e) => setSelectedStartDate(e.target.value)}
+                  className="w-full mb-4 lg:mb-0 px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out"
+                />
+                <input
+                  type="date"
+                  id="end-date"
+                  value={selectedEndDate}
+                  onChange={(e) => setSelectedEndDate(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Event List Section */}
+          <div className="col-span-2 lg:col-span-3">
+            <h2 className="text-3xl font-semibold text-gray-900 mb-6">
+              Upcoming Events
+            </h2>
+            <EventList events={filteredEvents} isLoading={isLoading} />
+          </div>
         </div>
-      </div>
-    </div>
-
-    {/* Event List Section */}
-    <div className="col-span-2 lg:col-span-3">
-      <h2 className="text-3xl font-semibold text-gray-900 mb-6">
-        Upcoming Events
-      </h2>
-      <EventList events={filteredEvents} isLoading={isLoading} />
-    </div>
-  </div>
-</main>
-
+      </main>
     </div>
   );
 };

@@ -36,23 +36,24 @@ const Modal = ({ isOpen, onClose, onSubmit, eventData = null, title }) => {
   };
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0]; // Get the selected file
+    const file = e.target.files[0]; 
 
-    const reader = new FileReader(); // Create a FileReader to read the file as a Data URL (Base64)
+    const reader = new FileReader();
 
     reader.onloadend = () => {
-      const base64String = reader.result; // The Base64 string of the file
-      setEventDetails({ ...eventDetails, image: base64String }); // Store the Base64 string in the state
+      const base64String = reader.result;
+      setEventDetails({ ...eventDetails, image: base64String });
     };
 
     if (file) {
-      reader.readAsDataURL(file); // Read the file as a Base64 string
+      reader.readAsDataURL(file);
     }
   };
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
     onSubmit(eventDetails);
+
   };
 
   return (
