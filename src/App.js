@@ -4,18 +4,23 @@ import Home from "./pages/Home";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/Register";
 import DashboardPage from "./pages/Dashboard";
-import { SnackbarProvider } from "notistack";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   return (
     <div className="App">
-      <SnackbarProvider
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-        autoHideDuration={3000}
-      ></SnackbarProvider>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
       <Router>
         <Routes>
           <Route path="/home" element={<Home />} />

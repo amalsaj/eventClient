@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../utils/api";
-import { enqueueSnackbar } from "notistack";
+import { toast } from 'react-toastify';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -31,16 +31,12 @@ const LoginPage = () => {
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("id", response.data.user._id);
       localStorage.setItem("role", "user");
-      enqueueSnackbar("Login Successfully 🎉", {
-        variant: "success",
-      });
+      toast.success("Login Successfully 🎉")
       navigate("/home");
     } catch (error) {
       setIsLoading(false);
       if (error.response && error.response.data) {
-        enqueueSnackbar(`${error.response.data.error}`, {
-          variant: "error",
-        });
+        toast.error(`${error.response.data.error}`)
         setError(error.response.data.error || "An error occurred.");
       } else {
         setError("An error occurred. Please try again.");
@@ -51,6 +47,7 @@ const LoginPage = () => {
   const handleGuestLogin = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("id");
+    toast.success("Login Successfully as Guest 🎉")
     navigate("/home");
     localStorage.setItem("role", "guest");
   };

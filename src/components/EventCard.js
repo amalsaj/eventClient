@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { addAttendee } from "../utils/api";
 import { MdPeople } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import { enqueueSnackbar } from "notistack";
+import { toast } from 'react-toastify';
 
 const EventCard = ({ event }) => {
   const navigate = useNavigate();
@@ -25,19 +25,13 @@ const EventCard = ({ event }) => {
       if (role === "user") {
         await addAttendee(_id);
         setAttendees((prev) => [...prev, { _id: userId }]);
-        enqueueSnackbar(`You Joined the ${name} event 🎉`, {
-          variant: "success",
-        });
+        toast.success(`You Joined the ${name} event 🎉`)
       } else if (role === "guest") {
-        enqueueSnackbar("Please log in to join the event! 👾", {
-          variant: "info",
-        });
+        toast.success("Please log in to join the event! 👾")
         navigate("/");
       }
     } catch (error) {
-      enqueueSnackbar(`${error}`, {
-        variant: "error",
-      });
+      toast.error(`${error}`)
       console.error("Error joining event:", error);
     }
   };

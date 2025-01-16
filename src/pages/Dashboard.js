@@ -8,7 +8,7 @@ import {
 } from "../utils/api";
 import Modal from "../components/Modal";
 import AttendeeList from "../components/AttendeeDetails";
-import { enqueueSnackbar } from "notistack";
+import { toast } from 'react-toastify';
 
 const DashboardPage = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -41,12 +41,10 @@ const DashboardPage = () => {
   const handleDelete = async (eventId) => {
     try {
       await deleteEvent(eventId);
-      enqueueSnackbar("Event deleted Successfully 🎉", {
-        variant: "success",
-      });
+      toast.success("Event deleted Successfully 🎉")
       fetchAllEvents();
     } catch (error) {
-      enqueueSnackbar(`${error}`, {
+      toast.error(`${error}`, {
         variant: "error",
       });
       console.error("Error deleting event:", error);
@@ -67,21 +65,15 @@ const DashboardPage = () => {
     try {
       if (modalType === "create") {
         await createEvent(eventDetails);
-        enqueueSnackbar("Event created Successfully 🎉", {
-          variant: "success",
-        });
+        toast.success("Event created Successfully 🎉")
       } else {
         await updateEvent(selectedEvent._id, eventDetails);
-        enqueueSnackbar("Event updated Successfully 🎉", {
-          variant: "success",
-        });
+        toast.success("Event updated Successfully 🎉",)
       }
       fetchAllEvents();
       setIsModalOpen(false);
     } catch (error) {
-      enqueueSnackbar(`${error}`, {
-        variant: "error",
-      });
+      toast.error(`${error}`)
       console.error("Error submitting event:", error);
     }
   };

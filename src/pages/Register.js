@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { registerUser } from "../utils/api";
-import { enqueueSnackbar } from "notistack";
+import { toast } from 'react-toastify';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -19,15 +19,11 @@ const RegisterPage = () => {
     e.preventDefault();
     try {
       await registerUser(formData);
-      enqueueSnackbar("Account Created Successfully 🎉", {
-        variant: "success",
-      });
+      toast.success("Account Created Successfully 🎉")
       navigate("/");
     } catch (error) {
       const errorMessage = error.response?.data?.error || "An error occurred";
-      enqueueSnackbar(`${errorMessage}`, {
-        variant: "error",
-      });
+      toast.error(`${errorMessage}`)
       setError(errorMessage);
     }
   };

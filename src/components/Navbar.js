@@ -3,7 +3,7 @@ import { IoMdNotificationsOutline } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
 import socket from "../utils/socket";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
-import { enqueueSnackbar } from "notistack";
+import { toast } from 'react-toastify';
 
 const Navbar = ({ onSearch, events }) => {
   const navigate = useNavigate();
@@ -18,9 +18,7 @@ const Navbar = ({ onSearch, events }) => {
     localStorage.removeItem("role");
     localStorage.removeItem("token");
     localStorage.removeItem("id");
-    enqueueSnackbar("Logout Successfully 🎉", {
-      variant: "success",
-    });
+    toast.success("Logout Successfully 🎉")
     navigate("/");
   };
 
